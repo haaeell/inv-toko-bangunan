@@ -69,7 +69,7 @@
                     </div>
                     <ul class="sidebar-menu">
                         <li class="menu-header">Dashboard</li>
-                        <li class="{{ request()->is('dashboard') ? 'active' : '' }}">
+                        <li class="{{ request()->is('home') ? 'active' : '' }}">
                             <a href="{{ route('home') }}" class="nav-link">
                                 <i class="bi bi-grid"></i>
                                 <span>Dashboard</span>
@@ -100,6 +100,15 @@
                                 <span>Laporan</span>
                             </a>
                         </li>
+                        @if (Auth::user()->role == 'admin')
+                        <li class="{{ request()->is('users') ? 'active' : '' }}">
+                            <a href="{{ route('users.index') }}" class="nav-link">
+                                <i class="bi bi-people-fill"></i>
+                                <span>Users</span>
+                            </a>
+                        </li>   
+                    @endif
+                    
                     </ul>
 
             </div>
@@ -141,6 +150,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous">
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     @yield('scripts')
 
     <script>

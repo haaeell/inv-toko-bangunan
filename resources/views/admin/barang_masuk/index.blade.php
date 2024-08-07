@@ -5,7 +5,10 @@
         <div class="col-md-12">
             <div class="card shadow border-0">
                 <div class="card-body">
-                    <button class="btn btn-primary rounded-3 mb-3" data-bs-toggle="modal" data-bs-target="#modalTambah">Tambah Barang Masuk</button>
+                    @if (Auth::user()->level == 'admin')
+                        <button class="btn btn-primary rounded-3 mb-3" data-bs-toggle="modal"
+                            data-bs-target="#modalTambah">Tambah Barang Masuk</button>
+                    @endif
                     @if (session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
@@ -17,7 +20,10 @@
                                     <th>Barang</th>
                                     <th>Jumlah Masuk</th>
                                     <th>Tanggal</th>
-                                    <th>Aksi</th>
+                                    @if (Auth::user()->level == 'admin')
+                                        <th>Aksi</th>
+                                    @endif
+
                                 </tr>
                             </thead>
                             <tbody>
@@ -27,14 +33,20 @@
                                         <td>{{ $item->barang->nama_barang }}</td>
                                         <td>{{ $item->jumlah_masuk }}</td>
                                         <td>{{ formatTanggal($item->created_at) }}</td>
-                                        <td>
-                                            <a href="{{ route('barang_masuk.edit', $item->id) }}" class="btn btn-primary btn-sm rounded-3">Edit</a>
-                                            <form action="{{ route('barang_masuk.destroy', $item->id) }}" method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm rounded-3">Hapus</button>
-                                            </form>
-                                        </td>
+                                        @if (Auth::user()->level == 'admin')
+                                            <td>
+                                                <a href="{{ route('barang_masuk.edit', $item->id) }}"
+                                                    class="btn btn-primary btn-sm rounded-3">Edit</a>
+                                                <form action="{{ route('barang_masuk.destroy', $item->id) }}" method="POST"
+                                                    style="display:inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="btn btn-danger btn-sm rounded-3">Hapus</button>
+                                                </form>
+                                            </td>
+                                        @endif
+
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -23,7 +23,7 @@
 </head>
 <body>
     <h1>Laporan Barang Bulanan</h1>
-    <h3>Tanggal Laporan: {{ $tanggal }}</h3>
+    <h3>Tanggal Laporan: {{ formatTanggal($tanggal) }}</h3>
     <table>
         <thead>
             <tr>
@@ -42,8 +42,8 @@
                     <td>{{ $item->nama_barang }}</td>
                     <td>{{ $item->jumlah_barang_masuk }}</td>
                     <td>{{ $item->jumlah_barang_keluar }}</td>
-                    <td>{{ number_format($item->penghasilan, 2) }}</td>
-                    <td>{{ number_format($item->keuntungan, 2) }}</td>
+                    <td>{{ formatRupiah($item->penghasilan, 2) }}</td>
+                    <td>{{ formatRupiah($item->keuntungan, 2) }}</td>
                 </tr>
             @endforeach
         </tbody>

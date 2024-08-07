@@ -5,8 +5,10 @@
         <div class="col-md-12">
             <div class="card shadow border-0">
                 <div class="card-body">
-                    <button class="btn btn-primary rounded-3 mb-3" data-toggle="modal"
-                        data-target="#modalTambah">Tambah</button>
+                    @if (auth()->user()->role == 'admin')
+                        <button class="btn btn-primary rounded-3 mb-3" data-toggle="modal"
+                            data-target="#modalTambah">Tambah</button>
+                    @endif
                     @if (session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @elseif (session('error'))
@@ -22,7 +24,10 @@
                                     <th>Harga Beli</th>
                                     <th>Harga Jual</th>
                                     <th>Stok</th>
+                                    @if (auth()->user()->role == 'admin')
                                     <th>Aksi</th>
+                                    @endif
+                                   
                                 </tr>
                             </thead>
                             <tbody>
@@ -37,6 +42,7 @@
                                         <td>{{ formatRupiah($item->harga_beli) }}</td>
                                         <td>{{ formatRupiah($item->harga_jual) }}</td>
                                         <td>{{ $item->jumlah_masuk - $item->jumlah_keluar }}</td>
+                                        @if (auth()->user()->role == 'admin')
                                         <td>
                                             <button class="btn btn-info btn-sm rounded-3" data-bs-toggle="modal"
                                                 data-bs-target="#modalEdit{{ $item->id }}">Edit</button>
@@ -45,6 +51,8 @@
                                                 data-url="{{ route('barang.destroy', $item->id) }}">Hapus</button>
 
                                         </td>
+                                        @endif
+                                      
                                     </tr>
 
                                     <!-- Modal Edit -->
