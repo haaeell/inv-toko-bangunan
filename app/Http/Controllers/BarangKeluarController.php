@@ -112,10 +112,6 @@ class BarangKeluarController extends Controller
 
         return redirect()->route('barang_keluar.index')->with('success', 'Barang keluar berhasil ditambahkan. Total harga jual: ' . number_format($hargaJualTotal, 0, ',', '.'));
     }
-
-
-
-
     // public function update(Request $request, $id)
     // {
     //     $request->validate([

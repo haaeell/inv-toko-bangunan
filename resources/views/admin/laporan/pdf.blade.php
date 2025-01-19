@@ -1,52 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Barang - {{ $tanggal }}</title>
+    <title>Laporan Barang Bulanan</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
+        table th, table td {
             padding: 8px;
+            border: 1px solid #ddd;
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #f4f4f4;
         }
     </style>
 </head>
 <body>
-    <h1>Laporan Barang Bulanan</h1>
-    <h3>Tanggal Laporan: {{ formatTanggal($tanggal) }}</h3>
+
+    <h2>Laporan Barang Bulanan - {{ $tanggal->format('F Y') }}</h2>
+    
     <table>
         <thead>
             <tr>
-                <th>No</th>
                 <th>Nama Barang</th>
-                <th>Jumlah Barang Masuk</th>
-                <th>Jumlah Barang Keluar</th>
+                <th>Total Barang Keluar</th>
+                <th>Total Pembelian</th>
+                <th>Total Penjualan</th>
                 <th>Penghasilan</th>
-                <th>Keuntungan</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($laporan as $item)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->nama_barang }}</td>
-                    <td>{{ $item->jumlah_barang_masuk }}</td>
-                    <td>{{ $item->jumlah_barang_keluar }}</td>
-                    <td>{{ formatRupiah($item->penghasilan, 2) }}</td>
-                    <td>{{ formatRupiah($item->keuntungan, 2) }}</td>
-                </tr>
+            <tr>
+                <td>{{ $item->barang->nama_barang }}</td>
+                <td>{{ $item->jumlah_keluar }}</td>
+                <td>{{ number_format($item->harga_beli, 0, ',', '.') }}</td>
+                <td>{{ number_format($item->harga_jual, 0, ',', '.') }}</td>
+                <td>{{ number_format($item->harga_jual - $item->harga_beli, 0, ',', '.') }}</td>
+            </tr>
             @endforeach
         </tbody>
     </table>
+
+    <h3>Total Penghasilan: {{ number_format($totalPenghasilan, 0, ',', '.') }}</h3>
+
 </body>
 </html>
