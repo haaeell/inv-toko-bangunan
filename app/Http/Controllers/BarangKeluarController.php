@@ -80,16 +80,19 @@ class BarangKeluarController extends Controller
 
         $sisaJumlah = $jumlahKeluar;
         $hargaJualTotal = 0;
+        $hargaBeliTotal = 0;
 
         foreach ($barangMasuk as $masuk) {
             if ($sisaJumlah <= $masuk->sisa_stok) {
                 $hargaJualTotal += $sisaJumlah * $masuk->harga_jual;
+                $hargaBeliTotal += $sisaJumlah * $masuk->harga_beli;
                 $masuk->sisa_stok -= $sisaJumlah;
                 $masuk->save();
                 $sisaJumlah = 0; 
                 break;
             } else {
                 $hargaJualTotal += $masuk->sisa_stok * $masuk->harga_jual;
+                $hargaBeliTotal += $masuk->sisa_stok * $masuk->harga_beli;
                 $sisaJumlah -= $masuk->sisa_stok;
                 $masuk->sisa_stok = 0;
                 $masuk->save();
@@ -104,6 +107,7 @@ class BarangKeluarController extends Controller
             'barang_id' => $barangId,
             'jumlah_keluar' => $jumlahKeluar,
             'harga_jual' => $hargaJualTotal,
+            'harga_beli' => $hargaBeliTotal,
         ]);
 
         return redirect()->route('barang_keluar.index')->with('success', 'Barang keluar berhasil ditambahkan. Total harga jual: ' . number_format($hargaJualTotal, 0, ',', '.'));

@@ -60,14 +60,21 @@
                             <tbody>
                                 @foreach ($laporan as $item)
                                 <tr>
-                                    <td>{{ $item['nama_barang'] }}</td>
-                                    <td>{{ $item['total_barang_keluar'] }}</td>
-                                    <td>{{ number_format($item['total_pembelian'], 0, ',', '.') }}</td>
-                                    <td>{{ number_format($item['total_penjualan'], 0, ',', '.') }}</td>
-                                    <td>{{ number_format($item['penghasilan'], 0, ',', '.') }}</td>
+                                    <td>{{ $item->barang->nama_barang }}</td>
+                                    <td>{{ $item->jumlah_keluar }}</td>
+                                    <td>{{ number_format($item->harga_beli, 0, ',', '.') }}</td>
+                                    <td>{{ number_format($item->harga_jual, 0, ',', '.') }}</td>
+                                    <td>{{ number_format($item->harga_jual - $item->harga_beli, 0, ',', '.') }}</td>
                                
                                 </tr>
                                 @endforeach
+                                <tr>
+                                    <th colspan="4" class="text-right">Total:</th>
+                                    @php
+                                        $totalPenghasilan = $laporan->sum('harga_jual') - $laporan->sum('harga_beli');
+                                    @endphp
+                                    <th>{{ number_format($totalPenghasilan, 0, ',', '.') }}</th>
+                                </tr>
                             </tbody>
                             <tfoot>
                                 <tr>

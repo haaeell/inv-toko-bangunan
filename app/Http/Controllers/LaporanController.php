@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Laporan;
 use Illuminate\Http\Request;
 use App\Models\Barang;
+use App\Models\BarangKeluar;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 
@@ -20,77 +21,7 @@ class LaporanController extends Controller
     $startDate = "{$tahun}-{$bulan}-01";
     $endDate = date('Y-m-t', strtotime($startDate));
 
-    // Query untuk mendapatkan data barang masuk berdasarkan tanggal
-    $barangMasuk = DB::table('barang_masuk')
-        ->join('barang', 'barang_masuk.barang_id', '=', 'barang.id')
-        ->whereBetween('barang_masuk.tanggal_masuk', [$startDate, $endDate])
-        ->select('barang_masuk.barang_id', 'barang.nama_barang', 'barang_masuk.tanggal_masuk', 'barang_masuk.harga_beli', 'barang_masuk.jumlah')
-        ->orderBy('barang_masuk.tanggal_masuk')  // Urutkan berdasarkan tanggal masuk barang
-        ->get();
-
-    // Query untuk mendapatkan total penjualan dan total jumlah barang keluar
-    $barangKeluar = DB::table('barang_keluar')
-        ->join('barang', 'barang_keluar.barang_id', '=', 'barang.id')
-        ->whereBetween('barang_keluar.created_at', [$startDate, $endDate])
-        ->select(
-            'barang_keluar.barang_id',
-            DB::raw('SUM(barang_keluar.jumlah_keluar) as total_barang_keluar'),
-            DB::raw('SUM(barang_keluar.harga_jual) as total_penjualan')
-        )
-        ->groupBy('barang_keluar.barang_id')
-        ->get();
-
-    // Proses FIFO untuk menghitung pembelian barang yang keluar
-    $laporan = $barangKeluar->map(function ($item) use ($barangMasuk) {
-        // Ambil semua barang masuk yang sesuai dengan barang_id
-        $barangMasukData = $barangMasuk->where('barang_id', $item->barang_id);
-
-        $totalPembelian = 0;
-        $totalBarangKeluar = $item->total_barang_keluar;
-        $hargaBeliPerBarangKeluar = [];
-
-        // Menggunakan FIFO untuk menghitung harga beli barang yang keluar
-        foreach ($barangMasukData as $barang) {
-            // Jika jumlah barang yang keluar sudah tercapai, berhenti
-            if ($totalBarangKeluar <= 0) {
-                break;
-            }
-
-            // Hitung jumlah barang yang akan keluar dari stok FIFO
-            $jumlahKeluar = min($totalBarangKeluar, $barang->jumlah);  // Ambil yang pertama kali masuk
-            $totalBarangKeluar -= $jumlahKeluar;
-
-            // Hitung total pembelian (harga beli * jumlah yang keluar)
-            $totalPembelian += $jumlahKeluar * $barang->harga_beli;
-
-            // Catat harga beli per barang keluar
-            $hargaBeliPerBarangKeluar[] = [
-                'jumlah_keluar' => $jumlahKeluar,
-                'harga_beli' => $barang->harga_beli,
-                'total' => $jumlahKeluar * $barang->harga_beli
-            ];
-
-            // Kurangi jumlah barang yang masuk setelah keluar
-            $barang->jumlah -= $jumlahKeluar;
-        }
-
-        // Menghitung total penjualan (sudah ada di data barang keluar)
-        $totalPenjualan = $item->total_penjualan;
-
-        // Menghitung penghasilan (total penjualan - total pembelian)
-        $penghasilan = $totalPenjualan - $totalPembelian;
-
-        return [
-            'nama_barang' => $barangMasukData->first()->nama_barang,
-            'total_barang_keluar' => $item->total_barang_keluar,
-            'total_pembelian' => $totalPembelian,
-            'total_penjualan' => $totalPenjualan,
-            'penghasilan' => $penghasilan,
-            'harga_beli_per_barang_keluar' => $hargaBeliPerBarangKeluar,
-        ];
-    });
-
-    // Kirim data ke view
+    $laporan = BarangKeluar::whereBetween('created_at', [$startDate, $endDate])->get();
     return view('admin.laporan.index', compact('laporan', 'bulan', 'tahun', 'tanggal'));
 }
 

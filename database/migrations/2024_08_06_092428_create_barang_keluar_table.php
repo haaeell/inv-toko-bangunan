@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('barang_id');
             $table->integer('jumlah_keluar');
             $table->integer('harga_jual');
+            $table->integer('harga_beli');
             $table->timestamps();
 
             $table->foreign('barang_id')->references('id')->on('barang')->onDelete('cascade');
