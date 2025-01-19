@@ -33,18 +33,12 @@ class LaporanController extends Controller
         $bulan = $tanggal->month;
         $tahun = $tanggal->year;
 
-        $laporan = Laporan::whereMonth('created_at', $bulan)
-            ->whereYear('created_at', $tahun)
-            ->get();
-
-        $totalPenghasilan = $laporan->sum(function ($item) {
-            return $item->harga_jual - $item->harga_beli;
-        });
+        $laporan = BarangKeluar::whereMonth('created_at', $bulan)
+        ->whereYear('created_at', $tahun)->get();
 
         $pdf = PDF::loadView('admin.laporan.pdf', [
             'tanggal' => $tanggal,
             'laporan' => $laporan,
-            'totalPenghasilan' => $totalPenghasilan
         ]);
 
         return $pdf->download('LAPORAN_' . $tanggal . '.pdf');

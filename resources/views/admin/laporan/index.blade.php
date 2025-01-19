@@ -76,12 +76,6 @@
                                     <th>{{ number_format($totalPenghasilan, 0, ',', '.') }}</th>
                                 </tr>
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th colspan="4" class="text-right">Total:</th>
-                                    <th></th>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
