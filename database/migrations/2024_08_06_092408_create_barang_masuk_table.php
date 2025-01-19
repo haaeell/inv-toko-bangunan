@@ -14,7 +14,11 @@ return new class extends Migration
         Schema::create('barang_masuk', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('barang_id');
-            $table->integer('jumlah_masuk');
+            $table->date('tanggal_masuk');
+            $table->integer('jumlah');
+            $table->integer('harga_beli');
+            $table->integer('harga_jual');
+            $table->integer('sisa_stok')->default(0);
             $table->timestamps();
 
             $table->foreign('barang_id')->references('id')->on('barang')->onDelete('cascade');

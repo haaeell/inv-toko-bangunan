@@ -1,20 +1,23 @@
 @extends('layouts.dashboard')
+
 @section('judul', 'Data Barang Keluar')
+
 @section('content')
     <div class="row">
         <div class="col-md-12">
             <div class="card shadow border-0">
                 <div class="card-body">
                     @if (Auth::user()->role == 'admin')
-                        
-                    <button class="btn btn-primary rounded-3 mb-3" data-bs-toggle="modal"
-                        data-bs-target="#modalTambah">Tambah</button>
+                        <button class="btn btn-primary rounded-3 mb-3" data-bs-toggle="modal"
+                            data-bs-target="#modalTambah">Tambah</button>
                     @endif
+
                     @if (session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
                     @elseif (session('error'))
                         <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
+
                     <div class="table-responsive">
                         <table class="table" id="datatable">
                             <thead>
@@ -22,6 +25,7 @@
                                     <th>No</th>
                                     <th>Nama Barang</th>
                                     <th>Jumlah Keluar</th>
+                                    <th>Total Harga</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -31,15 +35,15 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $item->barang->nama_barang }}</td>
                                         <td>{{ $item->jumlah_keluar }}</td>
+                                        <td>{{ $item->harga_jual }}</td>
                                         @if (Auth::user()->role == 'admin')
-                                        <td>
-                                            <button class="btn btn-primary btn-sm rounded-3" data-bs-toggle="modal"
-                                                data-bs-target="#modalEdit{{ $item->id }}">Edit</button>
-                                            <button class="btn btn-danger btn-sm rounded-3"
-                                                onclick="deleteData({{ $item->id }})">Hapus</button>
-                                        </td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm rounded-3" data-bs-toggle="modal"
+                                                    data-bs-target="#modalEdit{{ $item->id }}">Edit</button>
+                                                <button class="btn btn-danger btn-sm rounded-3"
+                                                    onclick="deleteData({{ $item->id }})">Hapus</button>
+                                            </td>
                                         @endif
-                                       
                                     </tr>
 
                                     <!-- Modal Edit -->
@@ -74,7 +78,8 @@
                                                             <label for="edit_stok_barang{{ $item->id }}"
                                                                 class="form-label">Stok Barang</label>
                                                             <input type="text" class="form-control"
-                                                                id="edit_stok_barang{{ $item->id }}" readonly>
+                                                                id="edit_stok_barang{{ $item->id }}" value="{{ $item->barang->stok }}"
+                                                                readonly>
                                                         </div>
                                                         <button type="submit" class="btn btn-primary">Update</button>
                                                     </form>
@@ -107,8 +112,7 @@
                             <select class="form-control" name="barang_id" id="barang_id" required>
                                 <option value="" disabled selected>Pilih Barang</option>
                                 @foreach ($barangList as $barang)
-                                    <option value="{{ $barang->id }}"
-                                        data-stok="{{ $barang->stok }}">
+                                    <option value="{{ $barang->id }}" data-stok="{{ $barang->stok }}">
                                         {{ $barang->nama_barang }}
                                     </option>
                                 @endforeach
@@ -143,10 +147,7 @@
                 const selectedOption = barangSelect.options[barangSelect.selectedIndex];
                 const stokTersedia = selectedOption.getAttribute('data-stok');
 
-                // Update readonly input with stok tersedia
                 stokBarangInput.value = stokTersedia;
-
-                // Clear any previous error messages
                 jumlahKeluarError.textContent = '';
             });
 
@@ -155,45 +156,11 @@
                 const jumlahKeluar = parseInt(jumlahKeluarInput.value) || 0;
 
                 if (jumlahKeluar > stokTersedia) {
-                    jumlahKeluarError.textContent =
-                    'Jumlah keluar tidak boleh melebihi stok yang tersedia.';
+                    jumlahKeluarError.textContent = 'Jumlah keluar tidak boleh melebihi stok yang tersedia.';
                 } else {
                     jumlahKeluarError.textContent = '';
                 }
             });
-
-            @foreach ($barangKeluar as $item)
-                (function() {
-                    const editBarangSelect = document.getElementById('edit_barang_id{{ $item->id }}');
-                    const editJumlahKeluarInput = document.getElementById('edit_jumlah_keluar{{ $item->id }}');
-                    const editJumlahKeluarError = document.getElementById(
-                        'edit_jumlah_keluar_error{{ $item->id }}');
-                    const editStokBarangInput = document.getElementById('edit_stok_barang{{ $item->id }}');
-
-                    editBarangSelect.addEventListener('change', function() {
-                        const selectedOption = editBarangSelect.options[editBarangSelect.selectedIndex];
-                        const stokTersedia = selectedOption.getAttribute('data-stok');
-
-                        // Update readonly input with stok tersedia
-                        editStokBarangInput.value = stokTersedia;
-
-                        // Clear any previous error messages
-                        editJumlahKeluarError.textContent = '';
-                    });
-
-                    editJumlahKeluarInput.addEventListener('input', function() {
-                        const stokTersedia = parseInt(editStokBarangInput.value) || 0;
-                        const jumlahKeluar = parseInt(editJumlahKeluarInput.value) || 0;
-
-                        if (jumlahKeluar > stokTersedia) {
-                            editJumlahKeluarError.textContent =
-                                'Jumlah keluar tidak boleh melebihi stok yang tersedia.';
-                        } else {
-                            editJumlahKeluarError.textContent = '';
-                        }
-                    });
-                })();
-            @endforeach
         });
 
         function deleteData(id) {

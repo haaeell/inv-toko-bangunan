@@ -23,17 +23,15 @@ class BarangMasukController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'barang_id' => 'required|exists:barang,id',
-            'jumlah_masuk' => 'required|integer|min:1',
+        BarangMasuk::create([
+            'barang_id' => $request->barang_id,
+            'jumlah' => $request->jumlah_masuk,
+            'harga_beli' => $request->harga_beli,
+            'harga_jual' => $request->harga_jual,
+            'tanggal_masuk' => now(),
+            'sisa_stok' => $request->jumlah_masuk
         ]);
 
-        $barang = Barang::findOrFail($request->barang_id);
-
-        $barang->jumlah_masuk += $request->jumlah_masuk;
-        $barang->save();
-
-        BarangMasuk::create($request->all());
         return redirect()->route('barang_masuk.index')->with('success', 'Barang masuk berhasil ditambahkan.');
     }
 

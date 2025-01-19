@@ -5,7 +5,7 @@
         <div class="col-md-12">
             <div class="card shadow border-0">
                 <div class="card-body">
-                    @if (Auth::user()->level == 'admin')
+                    @if (Auth::user()->role == 'admin')
                         <button class="btn btn-primary rounded-3 mb-3" data-bs-toggle="modal"
                             data-bs-target="#modalTambah">Tambah Barang Masuk</button>
                     @endif
@@ -19,6 +19,9 @@
                                     <th>No</th>
                                     <th>Barang</th>
                                     <th>Jumlah Masuk</th>
+                                    <th>Harga Beli</th>
+                                    <th>Total Harga Beli</th>
+                                    <th>Harga Jual</th>
                                     <th>Tanggal</th>
                                     @if (Auth::user()->level == 'admin')
                                         <th>Aksi</th>
@@ -31,8 +34,11 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $item->barang->nama_barang }}</td>
-                                        <td>{{ $item->jumlah_masuk }}</td>
-                                        <td>{{ formatTanggal($item->created_at) }}</td>
+                                        <td>{{ $item->jumlah }}</td>
+                                        <td>{{ formatRupiah($item->harga_beli) }}</td>
+                                        <td>{{ formatRupiah($item->harga_beli * $item->jumlah) }}</td>
+                                        <td>{{ formatRupiah($item->harga_jual) }}</td>
+                                        <td>{{ formatTanggal($item->tanggal_masuk) }}</td>
                                         @if (Auth::user()->level == 'admin')
                                             <td>
                                                 <a href="{{ route('barang_masuk.edit', $item->id) }}"
@@ -46,7 +52,6 @@
                                                 </form>
                                             </td>
                                         @endif
-
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -80,6 +85,14 @@
                         <div class="mb-3">
                             <label for="jumlah_masuk" class="form-label">Jumlah Masuk</label>
                             <input type="number" class="form-control" name="jumlah_masuk" id="jumlah_masuk" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="harga_beli" class="form-labelMasuk">Harga Beli </label>
+                            <input type="number" class="form-control" name="harga_beli" id="harga_beli" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="harga_jual" class="form-label">Harga Jual</label>
+                            <input type="number" class="form-control" name="harga_jual" id="harga_jual" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Simpan</button>
                     </form>

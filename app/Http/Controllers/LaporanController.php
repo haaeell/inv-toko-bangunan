@@ -11,46 +11,98 @@ use Illuminate\Support\Facades\DB;
 class LaporanController extends Controller
 {
     public function index(Request $request)
-    {
-        $bulan = $request->input('bulan', date('n')); // Get month number or default to current month
-        $tahun = $request->input('tahun', date('Y')); // Get year or default to current year
+{
+    $bulan = $request->input('bulan', date('n'));
+    $tahun = $request->input('tahun', date('Y'));
 
-        // Build start and end date for the given month and year
-        $startDate = "{$tahun}-{$bulan}-01";
-        $endDate = date('Y-m-t', strtotime($startDate));
+    $tanggal = "{$tahun}-{$bulan}";
+    // Menentukan tanggal awal dan akhir bulan
+    $startDate = "{$tahun}-{$bulan}-01";
+    $endDate = date('Y-m-t', strtotime($startDate));
 
-        $tanggal = "{$tahun}-{$bulan}";
+    // Query untuk mendapatkan data barang masuk berdasarkan tanggal
+    $barangMasuk = DB::table('barang_masuk')
+        ->join('barang', 'barang_masuk.barang_id', '=', 'barang.id')
+        ->whereBetween('barang_masuk.tanggal_masuk', [$startDate, $endDate])
+        ->select('barang_masuk.barang_id', 'barang.nama_barang', 'barang_masuk.tanggal_masuk', 'barang_masuk.harga_beli', 'barang_masuk.jumlah')
+        ->orderBy('barang_masuk.tanggal_masuk')  // Urutkan berdasarkan tanggal masuk barang
+        ->get();
 
-        $laporan = DB::table('barang')
-            ->select(
-                'barang.nama_barang',
-                'harga_jual',
-                'harga_beli',
-                DB::raw('COALESCE(SUM(barang_masuk.jumlah_masuk), 0) as jumlah_barang_masuk'),
-                DB::raw('COALESCE(SUM(barang_keluar.jumlah_keluar), 0) as jumlah_barang_keluar'),
-                DB::raw('COALESCE(SUM(barang_keluar.jumlah_keluar * barang.harga_jual), 0) as penghasilan'),
-                DB::raw('COALESCE(SUM(barang_keluar.jumlah_keluar * (barang.harga_jual - barang.harga_beli)), 0) as keuntungan'),
-                DB::raw('DATE_FORMAT("' . $startDate . '", "%Y-%m") as tanggal_laporan')
-            )
-            ->leftJoin('barang_masuk', 'barang.id', '=', 'barang_masuk.barang_id')
-            ->leftJoin('barang_keluar', 'barang.id', '=', 'barang_keluar.barang_id')
-            ->where(function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('barang_masuk.created_at', [$startDate, $endDate])
-                    ->orWhereBetween('barang_keluar.created_at', [$startDate, $endDate]);
-            })
-            ->groupBy('barang.id', 'barang.nama_barang', 'barang.harga_jual', 'barang.harga_beli')
-            ->get();
+    // Query untuk mendapatkan total penjualan dan total jumlah barang keluar
+    $barangKeluar = DB::table('barang_keluar')
+        ->join('barang', 'barang_keluar.barang_id', '=', 'barang.id')
+        ->whereBetween('barang_keluar.created_at', [$startDate, $endDate])
+        ->select(
+            'barang_keluar.barang_id',
+            DB::raw('SUM(barang_keluar.jumlah_keluar) as total_barang_keluar'),
+            DB::raw('SUM(barang_keluar.harga_jual) as total_penjualan')
+        )
+        ->groupBy('barang_keluar.barang_id')
+        ->get();
 
-            $totalPenghasilan = $laporan->sum('penghasilan');
-            $totalKeuntungan = $laporan->sum('keuntungan');
+    // Proses FIFO untuk menghitung pembelian barang yang keluar
+    $laporan = $barangKeluar->map(function ($item) use ($barangMasuk) {
+        // Ambil semua barang masuk yang sesuai dengan barang_id
+        $barangMasukData = $barangMasuk->where('barang_id', $item->barang_id);
 
-        return view('admin.laporan.index', compact('laporan', 'tanggal', 'bulan', 'tahun','totalPenghasilan','totalKeuntungan'));
-    }
+        $totalPembelian = 0;
+        $totalBarangKeluar = $item->total_barang_keluar;
+        $hargaBeliPerBarangKeluar = [];
+
+        // Menggunakan FIFO untuk menghitung harga beli barang yang keluar
+        foreach ($barangMasukData as $barang) {
+            // Jika jumlah barang yang keluar sudah tercapai, berhenti
+            if ($totalBarangKeluar <= 0) {
+                break;
+            }
+
+            // Hitung jumlah barang yang akan keluar dari stok FIFO
+            $jumlahKeluar = min($totalBarangKeluar, $barang->jumlah);  // Ambil yang pertama kali masuk
+            $totalBarangKeluar -= $jumlahKeluar;
+
+            // Hitung total pembelian (harga beli * jumlah yang keluar)
+            $totalPembelian += $jumlahKeluar * $barang->harga_beli;
+
+            // Catat harga beli per barang keluar
+            $hargaBeliPerBarangKeluar[] = [
+                'jumlah_keluar' => $jumlahKeluar,
+                'harga_beli' => $barang->harga_beli,
+                'total' => $jumlahKeluar * $barang->harga_beli
+            ];
+
+            // Kurangi jumlah barang yang masuk setelah keluar
+            $barang->jumlah -= $jumlahKeluar;
+        }
+
+        // Menghitung total penjualan (sudah ada di data barang keluar)
+        $totalPenjualan = $item->total_penjualan;
+
+        // Menghitung penghasilan (total penjualan - total pembelian)
+        $penghasilan = $totalPenjualan - $totalPembelian;
+
+        return [
+            'nama_barang' => $barangMasukData->first()->nama_barang,
+            'total_barang_keluar' => $item->total_barang_keluar,
+            'total_pembelian' => $totalPembelian,
+            'total_penjualan' => $totalPenjualan,
+            'penghasilan' => $penghasilan,
+            'harga_beli_per_barang_keluar' => $hargaBeliPerBarangKeluar,
+        ];
+    });
+
+    // Kirim data ke view
+    return view('admin.laporan.index', compact('laporan', 'bulan', 'tahun', 'tanggal'));
+}
+
+
+
+
+
 
 
     public function generate(Request $request)
     {
-       
+
         $tanggal = $request->tanggal_laporan;
         $startDate = date('Y-m-01', strtotime($tanggal));
         $endDate = date('Y-m-t', strtotime($tanggal));
@@ -80,7 +132,7 @@ class LaporanController extends Controller
                 'jumlah_barang_keluar' => $jumlahKeluar,
                 'penghasilan' => $penghasilan,
                 'keuntungan' => $keuntungan,
-                'tanggal_laporan' => $startDate, 
+                'tanggal_laporan' => $startDate,
             ]);
         }
 

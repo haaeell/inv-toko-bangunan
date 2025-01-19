@@ -21,8 +21,8 @@
                                     <th>No</th>
                                     <th>Gambar</th>
                                     <th>Nama</th>
-                                    <th>Harga Beli</th>
-                                    <th>Harga Jual</th>
+                                    {{-- <th>Harga Beli</th>
+                                    <th>Harga Jual</th> --}}
                                     <th>Stok</th>
                                     @if (auth()->user()->role == 'admin')
                                     <th>Aksi</th>
@@ -39,9 +39,9 @@
                                                 class="img-fluid rounded-5" style="width: 100px;border-radius:12px">
                                         </td>
                                         <td>{{ $item->nama_barang }}</td>
-                                        <td>{{ formatRupiah($item->harga_beli) }}</td>
-                                        <td>{{ formatRupiah($item->harga_jual) }}</td>
-                                        <td>{{ $item->jumlah_masuk - $item->jumlah_keluar }}</td>
+                                        {{-- <td>{{ formatRupiah($item->harga_beli) }}</td>
+                                        <td>{{ formatRupiah($item->harga_jual) }}</td> --}}
+                                        <td>{{ $item->stok}}</td>
                                         @if (auth()->user()->role == 'admin')
                                         <td>
                                             <button class="btn btn-info btn-sm rounded-3" data-bs-toggle="modal"
@@ -80,7 +80,7 @@
                                                                 id="edit_nama_barang" value="{{ $item->nama_barang }}"
                                                                 required>
                                                         </div>
-                                                        <div class="mb-3">
+                                                        {{-- <div class="mb-3">
                                                             <label for="edit_harga_beli" class="form-label">Harga
                                                                 Beli</label>
                                                             <input type="text" class="form-control" name="harga_beli"
@@ -93,7 +93,7 @@
                                                             <input type="text" class="form-control" name="harga_jual"
                                                                 id="edit_harga_jual"
                                                                 value="{{ formatRupiah($item->harga_jual) }}" required>
-                                                        </div>
+                                                        </div> --}}
                                                         <div class="mb-3">
                                                             <label for="edit_satuan" class="form-label">Satuan</label>
                                                             <input type="text" class="form-control" name="satuan"
@@ -145,14 +145,14 @@
                             <label for="nama_barang" class="form-label">Nama Barang</label>
                             <input type="text" class="form-control" name="nama_barang" id="nama_barang" required>
                         </div>
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label for="harga_beli" class="form-label">Harga Beli</label>
                             <input type="text" class="form-control" name="harga_beli" id="harga_beli" required>
                         </div>
                         <div class="mb-3">
                             <label for="harga_jual" class="form-label">Harga Jual</label>
                             <input type="text" class="form-control" name="harga_jual" id="harga_jual" required>
-                        </div>
+                        </div> --}}
 
                         <div class="mb-3">
                             <label for="satuan" class="form-label">Satuan</label>

@@ -10,15 +10,15 @@ class Barang extends Model
     use HasFactory;
 
     protected $table = 'barang';
+    protected $fillable = ['nama_barang', 'satuan', 'kategori', 'gambar'];
 
-    protected $fillable = [
-        'nama_barang',
-        'jumlah_masuk',
-        'jumlah_keluar',
-        'satuan',
-        'harga_jual',
-        'harga_beli',
-        'kategori',
-        'gambar',
-    ];
+    public function barangMasuk()
+    {
+        return $this->hasMany(BarangMasuk::class);
+    }
+
+    public function barangKeluar()
+    {
+        return $this->hasMany(BarangKeluar::class);
+    }
 }

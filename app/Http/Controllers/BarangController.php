@@ -12,7 +12,12 @@ class BarangController extends Controller
 
     public function index()
     {
-        $barang = Barang::all();
+        $barang = Barang::all()->map(function ($barang) {
+            $stokMasuk = $barang->barangMasuk()->sum('jumlah');
+            $stokKeluar = $barang->barangKeluar()->sum('jumlah_keluar');
+            $barang->stok = $stokMasuk - $stokKeluar;
+            return $barang;
+        });
         return view('admin.barang.index', compact('barang'));
     }
 
@@ -21,8 +26,8 @@ class BarangController extends Controller
         $request->validate([
             'nama_barang' => 'required|string|max:255',
             'satuan' => 'required|string|max:50',
-            'harga_jual' => 'required',
-            'harga_beli' => 'required',
+            // 'harga_jual' => 'required',
+            // 'harga_beli' => 'required',
             'kategori' => 'required|string|max:100',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
@@ -30,8 +35,8 @@ class BarangController extends Controller
         $barang = new Barang();
         $barang->nama_barang = $request->nama_barang;
         $barang->satuan = $request->satuan;
-        $barang->harga_jual = $this->removeRupiahFormat($request->harga_jual);
-        $barang->harga_beli = $this->removeRupiahFormat($request->harga_beli);
+        // $barang->harga_jual = $this->removeRupiahFormat($request->harga_jual);
+        // $barang->harga_beli = $this->removeRupiahFormat($request->harga_beli);
         $barang->kategori = $request->kategori;
 
         if ($request->hasFile('gambar')) {
@@ -67,15 +72,15 @@ class BarangController extends Controller
             'nama_barang' => 'required|string|max:255',
             'satuan' => 'required|string|max:50',
             'harga_jual' => 'required',
-            'harga_beli' => 'required',
-            'kategori' => 'required|string|max:100',
+            // 'harga_beli' => 'required',
+            // 'kategori' => 'required|string|max:100',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
         $barang->nama_barang = $request->nama_barang;
         $barang->satuan = $request->satuan;
-        $barang->harga_jual = $this->removeRupiahFormat($request->harga_jual);
-        $barang->harga_beli = $this->removeRupiahFormat($request->harga_beli);
+        // $barang->harga_jual = $this->removeRupiahFormat($request->harga_jual);
+        // $barang->harga_beli = $this->removeRupiahFormat($request->harga_beli);
         $barang->kategori = $request->kategori;
 
         if ($request->hasFile('gambar')) {
