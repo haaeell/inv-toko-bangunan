@@ -11,7 +11,7 @@ class BarangMasukController extends Controller
     public function index()
     {
         $barang = Barang::all();
-        $barangMasuk = BarangMasuk::with('barang')->get();
+        $barangMasuk = BarangMasuk::with('barang')->orderBy('tanggal_masuk', 'desc')->get();
         return view('admin.barang_masuk.index', compact('barangMasuk', 'barang'));
     }
 

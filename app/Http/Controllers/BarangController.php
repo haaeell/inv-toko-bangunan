@@ -71,7 +71,7 @@ class BarangController extends Controller
         $request->validate([
             'nama_barang' => 'required|string|max:255',
             'satuan' => 'required|string|max:50',
-            'harga_jual' => 'required',
+            // 'harga_jual' => 'required',
             // 'harga_beli' => 'required',
             // 'kategori' => 'required|string|max:100',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'

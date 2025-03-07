@@ -64,6 +64,7 @@
         <thead>
             <tr>
                 <th>Nama Barang</th>
+                <th>Tanggal</th>
                 <th>Total Barang Keluar</th>
                 <th>Total Pembelian</th>
                 <th>Total Penjualan</th>
@@ -74,6 +75,8 @@
             @foreach ($laporan as $item)
                 <tr>
                     <td>{{ $item->barang->nama_barang }}</td>
+                    <td>{{ $item->created_at->format('d F Y H:i') }}</td>
+
                     <td>{{ $item->jumlah_keluar }}</td>
                     <td>{{ number_format($item->harga_beli, 0, ',', '.') }}</td>
                     <td>{{ number_format($item->harga_jual, 0, ',', '.') }}</td>
@@ -81,7 +84,7 @@
                 </tr>
             @endforeach
             <tr>
-                <th colspan="4" class="text-right">Total:</th>
+                <th colspan="5" class="text-right">Total:</th>
                 @php
                     $totalPenghasilan = $laporan->sum('harga_jual') - $laporan->sum('harga_beli');
                 @endphp

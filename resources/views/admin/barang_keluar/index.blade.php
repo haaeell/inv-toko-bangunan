@@ -26,7 +26,8 @@
                                     <th>Nama Barang</th>
                                     <th>Jumlah Keluar</th>
                                     <th>Total Harga</th>
-                                    <th>Aksi</th>
+                                    <th>Tanggal</th>
+                                    <!-- <th>Aksi</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -36,14 +37,16 @@
                                         <td>{{ $item->barang->nama_barang }}</td>
                                         <td>{{ $item->jumlah_keluar }}</td>
                                         <td>{{ $item->harga_jual }}</td>
-                                        @if (Auth::user()->role == 'admin')
+                                        <!-- @if (Auth::user()->role == 'admin')
                                             <td>
                                                 <button class="btn btn-primary btn-sm rounded-3" data-bs-toggle="modal"
                                                     data-bs-target="#modalEdit{{ $item->id }}">Edit</button>
                                                 <button class="btn btn-danger btn-sm rounded-3"
                                                     onclick="deleteData({{ $item->id }})">Hapus</button>
                                             </td>
-                                        @endif
+                                        @endif -->
+                                        
+                    <td>{{ $item->created_at->format('d F Y H:i') }}</td>
                                     </tr>
 
                                     <!-- Modal Edit -->

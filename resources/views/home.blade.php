@@ -61,12 +61,14 @@
                     }]
                 },
                 options: {
+                    indexAxis: 'y', // Menjadikan chart horizontal
                     scales: {
-                        y: {
+                        x: {
                             beginAtZero: true
                         }
                     }
                 }
+
             });
 
          
