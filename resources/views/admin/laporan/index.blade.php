@@ -45,7 +45,37 @@
                     @if (session('success'))
                         <div class="alert alert-success mt-3">{{ session('success') }}</div>
                     @endif
+                    <div class="table-responsive my-3">
+                        <h6 class="fw bold">LAPORAN BARANG MASUK</h6>
+                        <table class="table" id="datatable">
+                            <thead>
+                                <tr>
+                                    <th>Nama Barang</th>
+                                    <th>Total Barang Masuk</th>
+                                    <th>Total Harga Pembelian</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($laporanMasuk as $item)
+                                <tr>
+                                    <td>{{ $item->barang->nama_barang }}</td>
+                                    <td>{{ $item->total_jumlah }}</td>
+                                    <td>{{ number_format($item->total_harga, 0, ',', '.') }}</td>
+                                </tr>
+                                @endforeach
+                                <tr>
+                                    <th colspan="2" class="text-right">Total:</th>
+                                    @php
+                                        $totalJumlah = $laporanMasuk->sum('total_jumlah');
+                                        $totalHarga = $laporanMasuk->sum('total_harga');
+                                    @endphp
+                                    <th>{{ number_format($totalHarga, 0, ',', '.') }}</th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
+                    <h6 class="fw-bold">LAPORAN BARANG KELUAR</h6>
                     <div class="table-responsive mt-3">
                         <table class="table" id="datatable">
                             <thead>
@@ -58,7 +88,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($laporan as $item)
+                                @foreach ($laporanKeluar as $item)
                                 <tr>
                                     <td>{{ $item->barang->nama_barang }}</td>
                                     <td>{{ $item->jumlah_keluar }}</td>
@@ -71,7 +101,7 @@
                                 <tr>
                                     <th colspan="4" class="text-right">Total:</th>
                                     @php
-                                        $totalPenghasilan = $laporan->sum('harga_jual') - $laporan->sum('harga_beli');
+                                        $totalPenghasilan = $laporanKeluar->sum('harga_jual') - $laporanKeluar->sum('harga_beli');
                                     @endphp
                                     <th>{{ number_format($totalPenghasilan, 0, ',', '.') }}</th>
                                 </tr>

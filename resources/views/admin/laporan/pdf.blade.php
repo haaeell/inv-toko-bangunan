@@ -30,8 +30,36 @@
 
 <body>
 
-    <h2>Laporan Barang Bulanan - {{ $tanggal->format('F Y') }}</h2>
 
+    <h2>Laporan Barang Masuk - {{ $tanggal }}</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Barang</th>
+                    <th>Total Barang Masuk</th>
+                    <th>Total Harga Pembelian</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($laporan as $item)
+            <tr>
+                <td>{{ $item->barang->nama_barang }}</td>
+                <td>{{ $item->total_jumlah }}</td>
+                <td>{{ number_format($item->total_harga, 0, ',', '.') }}</td>
+            </tr>
+            @endforeach
+            <tr>
+                <th colspan="2" class="text-right">Total:</th>
+                @php
+                    $totalJumlah = $laporanMasuk->sum('total_jumlah');
+                    $totalHarga = $laporanMasuk->sum('total_harga');
+                @endphp
+                <th>{{ number_format($totalHarga, 0, ',', '.') }}</th>
+            </tr>
+        </tbody>
+    </table>
+    <h2>Laporan Barang Masuk - {{ $tanggal }}</h2>
     <table>
         <thead>
             <tr>
