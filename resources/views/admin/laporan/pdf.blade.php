@@ -31,7 +31,7 @@
 <body>
 
 
-    <h2>Laporan Barang Masuk - {{ $tanggal }}</h2>
+    <h2>Laporan Barang Masuk - {{ \Carbon\Carbon::now()->translatedFormat('F Y') }}</h2>
 
     <table>
         <thead>
@@ -42,7 +42,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($laporan as $item)
+            @foreach ($laporanMasuk as $item)
             <tr>
                 <td>{{ $item->barang->nama_barang }}</td>
                 <td>{{ $item->total_jumlah }}</td>
@@ -59,7 +59,7 @@
             </tr>
         </tbody>
     </table>
-    <h2>Laporan Barang Masuk - {{ $tanggal }}</h2>
+    <h2>Laporan Barang Masuk - {{ \Carbon\Carbon::parse($tanggal)->translatedFormat('F Y') }}</h2>
     <table>
         <thead>
             <tr>
@@ -72,7 +72,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($laporan as $item)
+            @foreach ($laporanKeluar as $item)
                 <tr>
                     <td>{{ $item->barang->nama_barang }}</td>
                     <td>{{ $item->created_at->format('d F Y H:i') }}</td>
@@ -86,7 +86,7 @@
             <tr>
                 <th colspan="5" class="text-right">Total:</th>
                 @php
-                    $totalPenghasilan = $laporan->sum('harga_jual') - $laporan->sum('harga_beli');
+                    $totalPenghasilan = $laporanKeluar->sum('harga_jual') - $laporanKeluar->sum('harga_beli');
                 @endphp
                 <th>{{ number_format($totalPenghasilan, 0, ',', '.') }}</th>
             </tr>

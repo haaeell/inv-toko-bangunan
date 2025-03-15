@@ -19,7 +19,6 @@ class LaporanController extends Controller
         $tahun = $request->input('tahun', date('Y'));
 
         $tanggal = "{$tahun}-{$bulan}";
-        // Menentukan tanggal awal dan akhir bulan
         $startDate = "{$tahun}-{$bulan}-01";
         $endDate = date('Y-m-t', strtotime($startDate));
 
@@ -43,7 +42,7 @@ class LaporanController extends Controller
         $bulan = $tanggal->month;
         $tahun = $tanggal->year;
 
-        $laporan = BarangKeluar::whereMonth('created_at', $bulan)
+        $laporanKeluar = BarangKeluar::whereMonth('created_at', $bulan)
             ->whereYear('created_at', $tahun)->get();
 
         $laporanMasuk = BarangMasuk::select(
@@ -58,7 +57,7 @@ class LaporanController extends Controller
 
         $pdf = PDF::loadView('admin.laporan.pdf', [
             'tanggal' => $tanggal,
-            'laporan' => $laporan,
+            'laporanKeluar' => $laporanKeluar,
             'laporanMasuk' => $laporanMasuk
         ]);
 

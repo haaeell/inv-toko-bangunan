@@ -12,7 +12,7 @@
                             <div class="col-md-6">
                                 <div class="input-group mt-3">
                                     <select name="bulan" class="form-control" id="bulan_laporan" required>
-                                        @foreach(range(1, 12) as $month)
+                                        @foreach (range(1, 12) as $month)
                                             @php
                                                 $date = \Carbon\Carbon::create()->month($month)->format('Y-m');
                                                 $formattedMonth = \Carbon\Carbon::create($date)->translatedFormat('F');
@@ -26,13 +26,14 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="input-group mt-3">
-                                    <input type="number" name="tahun" class="form-control" id="tahun_laporan" value="{{ $tahun }}" required>
+                                    <input type="number" name="tahun" class="form-control" id="tahun_laporan"
+                                        value="{{ $tahun }}" required>
                                 </div>
                             </div>
                         </div>
                     </form>
 
-                    @if($tanggal)
+                    @if ($tanggal)
                         <div class="d-flex gap-2">
                             <form action="{{ route('laporan.cetak_pdf') }}" method="POST" class="mt-3">
                                 @csrf
@@ -57,11 +58,11 @@
                             </thead>
                             <tbody>
                                 @foreach ($laporanMasuk as $item)
-                                <tr>
-                                    <td>{{ $item->barang->nama_barang }}</td>
-                                    <td>{{ $item->total_jumlah }}</td>
-                                    <td>{{ number_format($item->total_harga, 0, ',', '.') }}</td>
-                                </tr>
+                                    <tr>
+                                        <td>{{ $item->barang->nama_barang }}</td>
+                                        <td>{{ $item->total_jumlah }}</td>
+                                        <td>{{ number_format($item->total_harga, 0, ',', '.') }}</td>
+                                    </tr>
                                 @endforeach
                                 <tr>
                                     <th colspan="2" class="text-right">Total:</th>
@@ -90,21 +91,21 @@
                             </thead>
                             <tbody>
                                 @foreach ($laporanKeluar as $item)
-                                <tr>
-                                    <td>{{ $item->barang->nama_barang }}</td>
-                                    
-                    <td>{{ $item->created_at->format('d F Y H:i') }}</td>
-                                    <td>{{ $item->jumlah_keluar }}</td>
-                                    <td>{{ number_format($item->harga_beli, 0, ',', '.') }}</td>
-                                    <td>{{ number_format($item->harga_jual, 0, ',', '.') }}</td>
-                                    <td>{{ number_format($item->harga_jual - $item->harga_beli, 0, ',', '.') }}</td>
-                               
-                                </tr>
+                                    <tr>
+                                        <td>{{ $item->barang->nama_barang }}</td>
+
+                                        <td>{{ $item->created_at->format('d F Y H:i') }}</td>
+                                        <td>{{ $item->jumlah_keluar }}</td>
+                                        <td>{{ number_format($item->harga_beli, 0, ',', '.') }}</td>
+                                        <td>{{ number_format($item->harga_jual, 0, ',', '.') }}</td>
+                                        <td>{{ number_format($item->harga_jual - $item->harga_beli, 0, ',', '.') }}</td>
+                                    </tr>
                                 @endforeach
                                 <tr>
                                     <th colspan="5" class="text-right">Total:</th>
                                     @php
-                                        $totalPenghasilan = $laporanKeluar->sum('harga_jual') - $laporanKeluar->sum('harga_beli');
+                                        $totalPenghasilan =
+                                            $laporanKeluar->sum('harga_jual') - $laporanKeluar->sum('harga_beli');
                                     @endphp
                                     <th>{{ number_format($totalPenghasilan, 0, ',', '.') }}</th>
                                 </tr>
